@@ -1,8 +1,9 @@
 {
   "index_name": "typesense_docs",
+  "allowed_domains": ["10.1.0.23"],
   "start_urls": [
     {
-      "url": "http://127.0.0.1:8080/"
+      "url": "http://10.1.0.23:8080/"
     }
   ],
   "selectors": {
