@@ -24,7 +24,7 @@ jobs:
           http-server &
           sleep 5
           echo "local http server running..."
-          docker run -p 8108:8108 -v /tmp/typesense-data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=testtest --enable-cors
+          docker run -d -p 8108:8108 -v /tmp/typesense-data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=testtest --enable-cors &
           sleep 5
       - name: Run typesense scrape
         uses: docker://typesense/docsearch-scraper:latest
