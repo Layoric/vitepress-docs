@@ -22,6 +22,7 @@ jobs:
           npm install http-server -g
           cd docs/.vitepress/dist
           http-server &
+          sleep 5
           echo "local http server running..."
       - name: Deploy to GitHub Pages
         run: |
