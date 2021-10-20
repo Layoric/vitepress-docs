@@ -17,6 +17,8 @@ jobs:
           rm -rf docs/.vitepress/dist/
       - name: Install and build
         run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
           npm install
           npm run docs:build
           npm install http-server -g
@@ -26,14 +28,8 @@ jobs:
           echo "local http server running..."
           docker run -d -p 8108:8108 -v /tmp/typesense-data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=testtest --enable-cors &
           sleep 5
-      - name: Run typesense scrape
-        uses: docker://typesense/docsearch-scraper:latest
-        env: 
-          TYPESENSE_API_KEY: testtest
-          TYPESENSE_HOST: 172.17.0.2
-          TYPESENSE_PORT: 8108
-          TYPESENSE_PROTOCOL: http
-          CONFIG: '{"index_name":"typesense_docs","start_urls":[{"url":"http://127.0.0.1:8080/"}],"selectors":{"default":{"lvl0":".content h1","lvl1":".content h2","lvl2":".content h3","lvl3":".content h4","lvl4":".content h5","text":".content p, .content ul li, .content table tbody tr"}},"scrape_start_urls":false,"strip_chars":" .,;:#"}'
+          docker run -it --env-file typesense-scraper.env -e "CONFIG=$(cat typesense-scraper-config.json | jq -r tostring)" typesense/docsearch-scraper
+          cd /tmp/typesense-data && ls -l
       - name: Deploy to GitHub Pages
         run: |
           cd docs/.vitepress/dist
