@@ -24,10 +24,9 @@ jobs:
           npm install http-server -g
           cd docs/.vitepress/dist
           http-server &
+          cd ../../..
           sleep 5
           echo "local http server running..."
-      - name: Generate search index
-        run: |
           docker run -d -p 8108:8108 -v /tmp/typesense-data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=testtest --enable-cors &
           sleep 5
           docker run -i --env-file typesense-scraper.env -e "CONFIG=$(cat typesense-scraper-config.json | jq -r tostring)" typesense/docsearch-scraper
