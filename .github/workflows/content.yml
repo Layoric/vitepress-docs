@@ -24,6 +24,16 @@ jobs:
           http-server &
           sleep 5
           echo "local http server running..."
+          docker run -p 8108:8108 -v /tmp/typesense-data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=testtest --enable-cors
+          sleep 5
+      - name: Run typesense scrape
+        uses: docker://typesense/docsearch-scraper:latest
+        env: 
+          TYPESENSE_API_KEY: testtest
+          TYPESENSE_HOST: 172.17.0.2
+          TYPESENSE_PORT: 8108
+          TYPESENSE_PROTOCOL: http
+          CONFIG: '{"index_name":"typesense_docs","start_urls":[{"url":"http://127.0.0.1:8080/"}],"selectors":{"default":{"lvl0":".content h1","lvl1":".content h2","lvl2":".content h3","lvl3":".content h4","lvl4":".content h5","text":".content p, .content ul li, .content table tbody tr"}},"scrape_start_urls":false,"strip_chars":" .,;:#"}'
       - name: Deploy to GitHub Pages
         run: |
           cd docs/.vitepress/dist
