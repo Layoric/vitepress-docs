@@ -1,10 +1,7 @@
 name: Build and Release Content
 
 on: 
-  push:
-    paths:
-      - 'docs/**'
-      - 'package.json'
+  push
 
 jobs:
   build:
