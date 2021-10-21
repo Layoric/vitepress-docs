@@ -40,7 +40,7 @@ jobs:
           echo "TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}" >> $GITHUB_ENV
           export TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}
           envsubst < "typesense-scraper.env" > "typesense-scraper-updated.env"
-          echo "172.17.0.2 search.docs.servicestack.net" | sudo tee -a /etc/hosts
+          echo "172.17.0.2 docs.servicestack.net" | sudo tee -a /etc/hosts
           docker run -i -d -p 80:8080 -v ${GITHUB_WORKSPACE}/docs/.vitepress/dist:/public danjellz/http-server
           echo "local http server running..."
           docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
