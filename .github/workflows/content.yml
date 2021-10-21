@@ -19,21 +19,6 @@ jobs:
         run: |
           npm install
           npm run docs:build
-          
-      - name: Create search index
-        run: |
-          echo "TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}" >> $GITHUB_ENV
-          export TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}
-          envsubst < "typesense-scraper.env" > "typesense-scraper-updated.env"
-          docker run -i -d -p 8080:8080 -v ${GITHUB_WORKSPACE}/docs/.vitepress/dist:/public danjellz/http-server
-          echo "local http server running..."
-          docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
-          sleep 5
-          docker run -i --env-file typesense-scraper-updated.env -e "CONFIG=$(cat typesense-scraper-config.json | jq -r tostring)" typesense/docsearch-scraper
-          cd /tmp/typesense-data && ls -l
-          curl 'http://172.17.0.3:8108/keys' -X POST -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -H 'Content-Type: application/json' -d '{"value": "N4N8bF0XwyvzwCGwm3CKB0QcnwyWtygo","description": "Search only","actions": ["documents:search"],"collections":["*"]}'
-          cd ${GITHUB_WORKSPACE}/typesense-data
-          docker build . -t servicestack-search
       - name: Deploy to GitHub Pages
         run: |
           cd docs/.vitepress/dist
@@ -49,4 +34,40 @@ jobs:
           branch: gh-pages
           force: true
           directory: ./docs/.vitepress/dist
+          
+      - name: Create search index
+        run: |
+          echo "TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}" >> $GITHUB_ENV
+          export TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}
+          envsubst < "typesense-scraper.env" > "typesense-scraper-updated.env"
+          docker run -i -d -p 8080:8080 -v ${GITHUB_WORKSPACE}/docs/.vitepress/dist:/public danjellz/http-server
+          echo "local http server running..."
+          docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
+          sleep 5
+          docker run -i --env-file typesense-scraper-updated.env -e "CONFIG=$(cat typesense-scraper-config.json | jq -r tostring)" typesense/docsearch-scraper
+          cd /tmp/typesense-data && ls -l
+          curl 'http://172.17.0.3:8108/keys' -X POST -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -H 'Content-Type: application/json' -d '{"value": "N4N8bF0XwyvzwCGwm3CKB0QcnwyWtygo","description": "Search only","actions": ["documents:search"],"collections":["*"]}'
+
+      - name: repository name fix
+        run: echo "image_repository_name=docs-search" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login_ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push to ECR
+        id: push_image_to_ecr
+        uses: docker/build-push-action@v2.2.2
+        with:
+          file: ./typesense-data/Dockerfile
+          context: ./typesense-data/
+          push: true
+          tags: ${{ steps.login_ecr.outputs.registry }}/${{ env.image_repository_name }}:latest
 
