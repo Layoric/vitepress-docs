@@ -33,12 +33,7 @@
         "${TYPESENSE_API_KEY}",
         "--enable-cors"
       ],
-      "mountPoints": [
-        {
-          "sourceVolume": "typesense-data-vol",
-          "containerPath": "/data"
-        }
-      ],
+      "mountPoints": [],
       "memoryReservation": 512,
       "image": "${IMAGE_URL}",
       "essential": true,
@@ -51,14 +46,6 @@
           "awslogs-create-group": "true"
         }
       }
-    }
-  ],
-  "volumes": [
-    {
-      "host": {
-        "sourcePath": "/tmp/typesense-data"
-      },
-      "name": "typesense-data-vol"
     }
   ]
 }
