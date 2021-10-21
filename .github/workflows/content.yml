@@ -17,6 +17,8 @@ jobs:
           rm -rf docs/.vitepress/dist/
       - name: Install and build
         run: |
+          echo "TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}" >> $GITHUB_ENV
+          export TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}
           envsubst < "typesense-scraper.env" > "typesense-scraper-updated.env"
           cat typesense-scraper-updated.env
           npm install
