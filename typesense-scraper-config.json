@@ -8,7 +8,7 @@
   ],
   "stop_urls": [
     {
-      "url": "https://docs.servicestack.net/releases/"
+      "url": "http://172.17.0.2:8080/releases/"
     }
   ],
   "selectors": {
