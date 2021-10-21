@@ -6,6 +6,11 @@
       "url": "http://172.17.0.2:8080/"
     }
   ],
+  "stop_urls": [
+    {
+      "url": "https://docs.servicestack.net/releases/"
+    }
+  ],
   "selectors": {
     "default": {
       "lvl0": ".content h1",
