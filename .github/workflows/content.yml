@@ -90,13 +90,14 @@ jobs:
 
       - name: Repository name fix and env values setup
         run: |
-          echo "image_repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "image_repository_name=docs-search" >> $GITHUB_ENV
           echo "domain=search.docs.servicestack.net" >> $GITHUB_ENV
           echo "letsencrypt_email=${{ secrets.LETSENCRYPT_EMAIL }}" >> $GITHUB_ENV
           echo "app_name=servicestack-docs-search" >> $GITHUB_ENV
           echo "cluster_name=default" >> $GITHUB_ENV
-          echo "image_url=${{ steps.login_ecr.outputs.registry }}/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'):${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          echo "image_url=${{ steps.login_ecr.outputs.registry }}/docs-search:latest" >> $GITHUB_ENV
           echo "aws_region=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "typesense_api_key=${{ secrets.TYPESENSE_API_KEY }}" >> $GITHUB_ENV
       - name: Populate task definition template
         uses: danielr1996/envsubst-action@1.0.0
         env:
@@ -104,6 +105,7 @@ jobs:
           APP_NAME: ${{ env.app_name }}
           IMAGE_URL: ${{ env.image_url }}
           HOST_DOMAIN: ${{ env.domain }}
+          TYPESENSE_API_KEY: ${{ env.typesense_api_key }}
           LETSENCRYPT_EMAIL: ${{ env.letsencrypt_email }}
           AWS_REGION: ${{ env.aws_region }}
           CLUSTER_NAME: ${{ env.cluster_name }}
