@@ -17,11 +17,11 @@ jobs:
           rm -rf docs/.vitepress/dist/
       - name: Install and build
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
+          envsubst < "typesense-scraper.env" > "typesense-scraper-updated.env"
+          cat typesense-scraper-updated.env
           npm install
           npm run docs:build
-          envsubst < "typesense-scraper.env" > "typesense-scraper-updated.env"
+          
           docker run -i -d -p 8080:8080 -v ${GITHUB_WORKSPACE}/docs/.vitepress/dist:/public danjellz/http-server
           echo "local http server running..."
           docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data/:/data typesense/typesense:0.21.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
