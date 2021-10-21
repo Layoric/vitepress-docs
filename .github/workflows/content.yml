@@ -108,7 +108,7 @@ jobs:
           AWS_REGION: ${{ env.aws_region }}
           CLUSTER_NAME: ${{ env.cluster_name }}
         with:
-          input: typesense-data/task-definition-template.json
+          input: typesense-data/typesense-task-def.json
           output: typesense-data/task-definition.json
 
       - name: Create task definition if doesn't exist
